@@ -1,6 +1,3 @@
 namespace Synq.Application.DTOs;
 
-public class MessageDto
-{
-    
-}
+public record MessageDto(Guid Id, string Content, Guid SenderId, DateTime SentAt);

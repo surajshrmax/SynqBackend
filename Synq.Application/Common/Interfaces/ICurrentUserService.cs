@@ -1,6 +1,6 @@
 namespace Synq.Application.Common.Interfaces;
 
-public interface ICurrentUserInterface
+public interface ICurrentUserService
 {
    public Guid UserId { get; }
    public bool IsAuthenticated { get; }

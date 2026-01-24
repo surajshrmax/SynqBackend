@@ -13,6 +13,8 @@ public class User
     public DateTime UpdatedAt { get; set; }
 
     public UserProfile UserProfile { get; private set; } = null!;
+
+    public ICollection<ChatMember> ChatMembers { get; set; }
     
     public User(){}
 

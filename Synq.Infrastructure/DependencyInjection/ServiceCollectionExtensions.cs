@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Synq.Application.Common.Interfaces;
+using Synq.Infrastructure.Behaviours;
 using Synq.Infrastructure.Identity;
 using Synq.Infrastructure.Persistence;
 
@@ -15,6 +16,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<AppDbContext>());
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IChatService, ChatService>();
         return services;
     }
 }

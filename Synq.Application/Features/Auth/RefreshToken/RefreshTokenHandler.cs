@@ -10,9 +10,7 @@ public class RefreshTokenHandler(IApplicationDbContext dbContext, IJwtTokenServi
     public async Task<TokenDto> Handle(RefreshTokenCommand command, CancellationToken cancellationToken)
     {
         var token = await dbContext.RefreshTokens
-            .Where(t => t.Token == command.RefreshToken && t.ExpiresAt < DateTime.UtcNow && !t.IsRevoked)
-            .Include(t => t.User)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(t => t.Token == command.RefreshToken && !t.IsRevoked && DateTime.UtcNow < t.ExpiresAt, cancellationToken);
 
         if (token == null)
         {
@@ -21,7 +19,9 @@ public class RefreshTokenHandler(IApplicationDbContext dbContext, IJwtTokenServi
 
         token.IsRevoked = true;
 
-        var newToken = jwtTokenService.GenerateNewToken(token.User);
+        var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == token.UserId);
+
+        var newToken = jwtTokenService.GenerateNewToken(user);
         var refreshToken = new Domain.Entities.RefreshToken(token.UserId, newToken.RefreshToken);
 
         await dbContext.RefreshTokens.AddAsync(refreshToken, cancellationToken);

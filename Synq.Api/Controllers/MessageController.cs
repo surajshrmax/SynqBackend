@@ -22,10 +22,10 @@ public class MessageController(IMediator mediator) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("{chatId}")]
-    public async Task<IActionResult> GetMessages(string chatId)
+    [HttpGet]
+    public async Task<IActionResult> GetMessages([FromQuery] GetMessagesQuery query)
     {
-        return Ok(await mediator.Send(new GetMessagesQuery(chatId)));
+        return Ok(await mediator.Send(query));
     }
 
     [Authorize]
@@ -40,17 +40,4 @@ public class MessageController(IMediator mediator) : ControllerBase
         return Ok(res);
     }
 
-    [Authorize]
-    [HttpDelete("{messageId}")]
-    public async Task<IActionResult> DeleteMessage(string messageId)
-    {
-        var res = await mediator.Send(new DeleteMessageCommand(messageId));
-        if (res)
-        {
-            return NoContent();
-        }
-
-        return Forbid();
-    }
-    
 }

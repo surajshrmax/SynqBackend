@@ -1,4 +1,6 @@
 using MediatR;
+using Synq.Application.DTOs;
+using Synq.Application.DTOs.Message;
 
 namespace Synq.Application.Features.Message.SendMessage;
 
@@ -8,4 +10,4 @@ public enum IdType
     User = 1
 }
 
-public record SendMessageCommand(string Content, string Id, IdType Type) : IRequest<Guid>;
+public record SendMessageCommand(string Content, string Id, IdType Type) : IRequest<MessageResponse>;

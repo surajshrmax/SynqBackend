@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Synq.Application.Common.Interfaces;
 using Synq.Application.DTOs;
+using Synq.Application.Mappers;
 
 namespace Synq.Application.Features.Message.UpdateMessage;
 
@@ -21,7 +22,6 @@ public class UpdateMessageHandler(IApplicationDbContext dbContext, ICurrentUserS
         message.Content = command.Content;
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new MessageDto(Id: message.Id, Content: message.Content, SenderId: message.SenderId,
-            SentAt: message.SentAt);
+        return message.ToDto();
     }
 }

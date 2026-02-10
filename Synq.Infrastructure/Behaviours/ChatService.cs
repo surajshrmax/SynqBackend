@@ -4,18 +4,21 @@ using Synq.Domain.Entities;
 
 namespace Synq.Infrastructure.Behaviours;
 
-public class ChatService(IApplicationDbContext dbContext) : IChatService {
-    public async Task<Guid> CreateOneToOneChatAsync(Guid currentUserId,Guid memberId, CancellationToken cancellationToken)
+public class ChatService(IApplicationDbContext dbContext) : IChatService
+{
+    public async Task<Guid> CreateOneToOneChatAsync(Guid currentUserId, Guid memberId, CancellationToken cancellationToken)
     {
-        var chat = await dbContext.ChatMembers.AsNoTracking()
-            .Where(cm => cm.UserId == currentUserId || cm.UserId == memberId)
+        var chatId = await dbContext.ChatMembers
             .GroupBy(cm => cm.ChatId)
-            .Select(c => c.Key)
+            .Where(g =>
+                g.Any(cm => cm.UserId == currentUserId) &&
+                g.Any(cm => cm.UserId == memberId))
+            .Select(g => g.Key)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (chat != Guid.Empty)
+        if (chatId != Guid.Empty)
         {
-            return chat;
+            return chatId;
         }
 
         var newChat = new Chat

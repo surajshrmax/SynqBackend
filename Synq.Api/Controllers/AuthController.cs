@@ -1,6 +1,8 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Synq.Application.Features.Auth.Login;
+using Synq.Application.Features.Auth.Logout;
 using Synq.Application.Features.Auth.RefreshToken;
 using Synq.Application.Features.Auth.Register;
 
@@ -30,5 +32,13 @@ public class AuthController(IMediator mediator) : ControllerBase
     {
         var res = await mediator.Send(command);
         return Ok(res);
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> LogoutUser()
+    {
+        var res = await mediator.Send(new LogoutCommand());
+        return res ? Ok() : Forbid();
     }
 }

@@ -35,11 +35,4 @@ public class UserController(IMediator mediator) : ControllerBase
 
         return Ok(users);
     }
-
-    [Authorize]
-    [HttpGet]
-    public IActionResult GetProfile()
-    {
-        return Ok(User.FindFirstValue(ClaimTypes.NameIdentifier));
-    }
 }

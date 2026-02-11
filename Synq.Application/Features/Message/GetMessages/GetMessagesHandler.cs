@@ -46,7 +46,7 @@ public class GetMessagesHandler(IApplicationDbContext dbContext, ICurrentUserSer
               .Take(pageSize);
         }
 
-        List<MessageDto> messageDto = await messagePage.Select(m => new MessageDto(Id: m.Id, Content: m.Content, ChatId: m.ChatId, Sender: new UserDto
+        List<MessageDto> messageDto = await messagePage.Select(m => new MessageDto(Id: m.Id, Content: m.Content, IsEdited: m.IsEdited,ChatId: m.ChatId, Sender: new UserDto
         {
             Id = m.Sender.Id,
             Username = m.Sender.Username,

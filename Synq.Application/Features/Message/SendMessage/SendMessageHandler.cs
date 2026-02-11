@@ -54,6 +54,6 @@ public class SendMessageHandler(IApplicationDbContext dbContext, ICurrentUserSer
         var recieverId = chat.ChatMembers.First(cm => cm.UserId != senderId).UserId;
         var sender = await dbContext.Users.AsNoTracking().Where(u => u.Id == senderId).Include(u => u.UserProfile).Select(UserMapper.ToDtoExpr).FirstAsync(cancellationToken);
 
-        return new MessageResponse(RecieverId: recieverId, Message: new MessageDto(message.Id, message.Content, message.ChatId, sender, message.SenderId, message.SentAt));
+        return new MessageResponse(RecieverId: recieverId, Message: new MessageDto(message.Id, message.Content, message.IsEdited, message.ChatId, sender, message.SenderId, message.SentAt));
     }
 }

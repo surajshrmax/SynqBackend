@@ -27,17 +27,4 @@ public class MessageController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(query));
     }
-
-    [Authorize]
-    [HttpPatch]
-    public async Task<IActionResult> UpdateMessage(UpdateMessageCommand command)
-    {
-        var res = await mediator.Send(command);
-        if (res == null)
-        {
-            return Unauthorized();
-        }
-        return Ok(res);
-    }
-
 }

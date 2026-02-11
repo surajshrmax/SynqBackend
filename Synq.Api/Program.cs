@@ -2,8 +2,10 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Synq.Api.Hubs;
+using Synq.Application.Common.Interfaces;
 using Synq.Application.DependencyInjection;
 using Synq.Infrastructure.DependencyInjection;
+using Synq.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSignalR();
 
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 

@@ -16,7 +16,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<AppDbContext>());
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IChatService, ChatService>();
         return services;
     }

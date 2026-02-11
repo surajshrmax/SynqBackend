@@ -6,22 +6,34 @@ using Synq.Application.Mappers;
 
 namespace Synq.Application.Features.Message.UpdateMessage;
 
-public class UpdateMessageHandler(IApplicationDbContext dbContext, ICurrentUserService currentUserService) : IRequestHandler<UpdateMessageCommand, MessageDto?>
+public class UpdateMessageHandler(IApplicationDbContext dbContext, ICurrentUserService currentUserService) : IRequestHandler<UpdateMessageCommand, (Guid?, MessageDto?)>
 {
-    public async Task<MessageDto?> Handle(UpdateMessageCommand command, CancellationToken cancellationToken)
+  public async Task<(Guid?, MessageDto?)> Handle(UpdateMessageCommand command, CancellationToken cancellationToken)
+  {
+    var messageId = Guid.Parse(command.MessageId);
+    var message = await dbContext.Messages
+        .Where(m => m.Id == messageId && m.SenderId == currentUserService.UserId)
+        .Include(c => c.Sender)
+        .ThenInclude(c => c.UserProfile)
+        .FirstOrDefaultAsync(cancellationToken);
+
+    if (message == null)
     {
-        var messageId = Guid.Parse(command.MessageId);
-        var message = await dbContext.Messages.Where(m => m.Id == messageId && m.SenderId == currentUserService.UserId)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (message == null)
-        {
-            return null;
-        }
-
-        message.Content = command.Content;
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        return message.ToDto();
+      return (Guid.Empty, null);
     }
+
+    message.Content = command.Content;
+    message.IsEdited = true;
+    await dbContext.SaveChangesAsync(cancellationToken);
+
+    var chat = await dbContext.Chats
+                .Where(c => c.Id == message.ChatId)
+                .Include(c => c.ChatMembers)
+                .FirstOrDefaultAsync(cancellationToken);
+
+    var recieverId = chat?.ChatMembers?.FirstOrDefault(m => m.UserId != currentUserService.UserId)?.UserId;
+
+    return (recieverId, new MessageDto(
+          message.Id, message.Content, message.IsEdited, message.ChatId, message.Sender.ToDto(), message.SenderId, message.SentAt));
+  }
 }

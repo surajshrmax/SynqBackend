@@ -5,8 +5,8 @@ namespace Synq.Application.Mappers;
 
 public static class MessageMapper
 {
-    public static MessageDto ToDto(this Message message)
-    {
-        return new MessageDto(Id: message.Id, Content: message.Content, ChatId: message.ChatId, Sender: message.Sender.ToDto(), SenderId: message.SenderId, SentAt: message.SentAt);
-    }
+  public static MessageDto ToDto(this Message message)
+  {
+    return new MessageDto(Id: message.Id, Content: message.Content, IsEdited: message.IsEdited, ChatId: message.ChatId, Sender: message.Sender.ToDto(), SenderId: message.SenderId, SentAt: message.SentAt);
+  }
 }

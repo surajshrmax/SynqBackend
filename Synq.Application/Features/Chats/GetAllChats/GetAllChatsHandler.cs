@@ -30,6 +30,7 @@ public class GetAllChatsHandler(IApplicationDbContext dbContext, ICurrentUserSer
                     .Select(m => new MessageDto(
                         Id: m.Id,
                         Content: m.Content,
+                        IsEdited: m.IsEdited,
                         ChatId: m.ChatId,
                         Sender: new UserDto
                         {

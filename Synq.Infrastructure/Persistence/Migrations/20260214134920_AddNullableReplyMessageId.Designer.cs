@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Synq.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using Synq.Infrastructure.Persistence;
 namespace Synq.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260214134920_AddNullableReplyMessageId")]
+    partial class AddNullableReplyMessageId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,8 +113,6 @@ namespace Synq.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChatId");
-
-                    b.HasIndex("ReplyMessageId");
 
                     b.HasIndex("SenderId");
 
@@ -248,10 +249,6 @@ namespace Synq.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Synq.Domain.Entities.Message", "ReplyMessage")
-                        .WithMany("Replies")
-                        .HasForeignKey("ReplyMessageId");
-
                     b.HasOne("Synq.Domain.Entities.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
@@ -259,8 +256,6 @@ namespace Synq.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Chat");
-
-                    b.Navigation("ReplyMessage");
 
                     b.Navigation("Sender");
                 });
@@ -317,11 +312,6 @@ namespace Synq.Infrastructure.Persistence.Migrations
                     b.Navigation("ChatMembers");
 
                     b.Navigation("Messages");
-                });
-
-            modelBuilder.Entity("Synq.Domain.Entities.Message", b =>
-                {
-                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("Synq.Domain.Entities.User", b =>

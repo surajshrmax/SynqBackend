@@ -5,8 +5,19 @@ namespace Synq.Application.Mappers;
 
 public static class MessageMapper
 {
-  public static MessageDto ToDto(this Message message)
+  public static MessageDto? ToDto(this Message message)
   {
-    return new MessageDto(Id: message.Id, Content: message.Content, IsEdited: message.IsEdited, ChatId: message.ChatId, Sender: message.Sender.ToDto(), SenderId: message.SenderId, SentAt: message.SentAt);
+    if (message == null) return null;
+    return new MessageDto
+    {
+      Id = message.Id,
+      Content = message.Content,
+      IsEdited = message.IsEdited,
+      ReplyMessageId = message.ReplyMessageId,
+      ChatId = message.ChatId,
+      Sender = message.Sender.ToDto(),
+      SenderId = message.SenderId,
+      SentAt = message.SentAt
+    };
   }
 }

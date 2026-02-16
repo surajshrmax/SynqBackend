@@ -33,7 +33,6 @@ public class UpdateMessageHandler(IApplicationDbContext dbContext, ICurrentUserS
 
     var recieverId = chat?.ChatMembers?.FirstOrDefault(m => m.UserId != currentUserService.UserId)?.UserId;
 
-    return (recieverId, new MessageDto(
-          message.Id, message.Content, message.IsEdited, message.ChatId, message.Sender.ToDto(), message.SenderId, message.SentAt));
+    return (recieverId, message.ToDto());
   }
 }

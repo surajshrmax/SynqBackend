@@ -30,7 +30,7 @@ public class MessageHub(IMediator mediator) : Hub
     var (recieverId, msg) = await mediator.Send(updateMessageCommand);
     await Clients.Caller.SendAsync("UpdateDone", msg);
 
-    if (ActiveConnections.TryGetValue(recieverId.ToString(), out var connections))
+    if (ActiveConnections.TryGetValue(recieverId.ToString()!, out var connections))
     {
       await Clients.Clients(connections).SendAsync("MessageUpdate", msg);
     }

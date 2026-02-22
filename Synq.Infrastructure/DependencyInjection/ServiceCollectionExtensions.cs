@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IChatService, ChatService>();
+        services.AddScoped(typeof(IJsonHelper<>) , typeof(JsonHelper<>));
         return services;
     }
 }

@@ -21,7 +21,7 @@ public class GetAllChatsHandler(IApplicationDbContext dbContext, ICurrentUserSer
                 Name = u.User.UserProfile.Name,
                 ImageUrl = u.User.UserProfile.ImageUrl,
               }
-            }).First(),
+            }).FirstOrDefault(),
             LastMessage: c.Messages.OrderByDescending(m => m.SentAt)
                 .Select(m => new MessageDto
                 {
@@ -38,7 +38,7 @@ public class GetAllChatsHandler(IApplicationDbContext dbContext, ICurrentUserSer
                   SenderId = m.SenderId,
                   SentAt = m.SentAt
                 })
-                .First()))
+                .FirstOrDefault()))
         .ToListAsync(cancellationToken);
 
     return chats;

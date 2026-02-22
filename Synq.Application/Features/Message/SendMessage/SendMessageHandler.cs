@@ -14,7 +14,12 @@ public class SendMessageHandler(IApplicationDbContext dbContext, ICurrentUserSer
   public async Task<MessageResponse> Handle(SendMessageCommand command, CancellationToken cancellationToken)
   {
     var currentUserId = currentUserService.UserId;
-    var replyMessageId = Guid.Parse(command.ReplyMessageId);
+    Guid? replyMessageId = null;
+
+    if (command.ReplyMessageId != null)
+    {
+      replyMessageId = Guid.Parse(command.ReplyMessageId);
+    }
 
     if (command.Type == IdType.User)
     {

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Synq.Application.DTOs;
 using Synq.Domain.Entities;
 
@@ -20,4 +21,26 @@ public static class MessageMapper
       SentAt = message.SentAt
     };
   }
+
+  public static Expression<Func<Message, MessageDto>> toDtoExpr = m => new MessageDto
+  {
+    Id = m.Id,
+    Content = m.Content,
+    IsEdited = m.IsEdited,
+    ReplyMessageId = m.ReplyMessageId,
+    Reply = m.ReplyMessage.ToDto(),
+    ChatId = m.ChatId,
+    Sender = new UserDto
+    {
+      Id = m.Sender.Id,
+      Username = m.Sender.Username,
+      UserProfile = new UserProfileDto
+      {
+        Name = m.Sender.UserProfile.Name,
+        ImageUrl = m.Sender.UserProfile.ImageUrl,
+      }
+    },
+    SenderId = m.SenderId,
+    SentAt = m.SentAt
+  };
 }

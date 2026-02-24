@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Synq.Api.Hubs;
+using Synq.Api.Realtime;
 using Synq.Application.Common.Interfaces;
 using Synq.Application.DependencyInjection;
 using Synq.Infrastructure.DependencyInjection;
@@ -14,10 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR().AddHubOptions<MessageHub>(options => options.EnableDetailedErrors = true);
 
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddSingleton<IRealTimeMessageNotifier, RealtimeMessageNotifier>();
 builder.Services.AddApplication();
 
 builder.Services.AddAuthentication(options =>
@@ -54,22 +56,15 @@ builder.Services.AddAuthentication(options =>
   };
 });
 
+
 var app = builder.Build();
 
+app.UseHttpsRedirection();
+app.UseRouting();
 
-using (var scope = app.Services.CreateScope())
-{
-  var db = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
-
-  if (db is AppDbContext concretDb)
-  {
-    concretDb.Database.Migrate();
-    TempDbSeeder.Seed(concretDb);
-  }
-}
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<MessageHub>("/messageHub");
-app.UseAuthentication();
-app.UseAuthorization();
 app.Run();

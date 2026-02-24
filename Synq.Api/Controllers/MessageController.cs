@@ -18,8 +18,8 @@ public class MessageController(IMediator mediator) : ControllerBase
   [HttpPost]
   public async Task<IActionResult> SendMessage(SendMessageCommand command)
   {
-    var id = await mediator.Send(command);
-    return Ok(id);
+    await mediator.Send(command);
+    return Ok();
   }
 
   [HttpGet("initial")]

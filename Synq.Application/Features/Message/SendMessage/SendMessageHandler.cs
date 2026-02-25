@@ -22,9 +22,9 @@ public class SendMessageHandler(
     var currentUserId = currentUserService.UserId;
     Guid? replyMessageId = null;
 
-    if (command.ReplyMessageId != null)
+    if (command.ReplyToMessageId != null)
     {
-      replyMessageId = Guid.Parse(command.ReplyMessageId);
+      replyMessageId = Guid.Parse(command.ReplyToMessageId);
     }
 
     if (!command.IsChat)

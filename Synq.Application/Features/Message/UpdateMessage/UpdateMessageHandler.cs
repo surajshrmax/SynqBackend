@@ -6,9 +6,14 @@ using Synq.Application.Mappers;
 
 namespace Synq.Application.Features.Message.UpdateMessage;
 
-public class UpdateMessageHandler(IApplicationDbContext dbContext, ICurrentUserService currentUserService) : IRequestHandler<UpdateMessageCommand, (Guid?, MessageDto?)>
+public class UpdateMessageHandler(
+    IApplicationDbContext dbContext,
+    ICurrentUserService currentUserService,
+    IConnectionStore connectionStore,
+    IRealTimeMessageNotifier messageNotifier
+) : IRequestHandler<UpdateMessageCommand>
 {
-  public async Task<(Guid?, MessageDto?)> Handle(UpdateMessageCommand command, CancellationToken cancellationToken)
+  public async Task Handle(UpdateMessageCommand command, CancellationToken cancellationToken)
   {
     var messageId = Guid.Parse(command.MessageId);
     var message = await dbContext.Messages
@@ -19,7 +24,7 @@ public class UpdateMessageHandler(IApplicationDbContext dbContext, ICurrentUserS
 
     if (message == null)
     {
-      return (Guid.Empty, null);
+      return;
     }
 
     message.Content = command.Content;
@@ -33,6 +38,16 @@ public class UpdateMessageHandler(IApplicationDbContext dbContext, ICurrentUserS
 
     var recieverId = chat?.ChatMembers?.FirstOrDefault(m => m.UserId != currentUserService.UserId)?.UserId;
 
-    return (recieverId, message.ToDto());
+    if (recieverId != null &&
+        recieverId != Guid.Empty &&
+        connectionStore.TryGet(recieverId.ToString(), out string recieverConnectionId))
+    {
+      await messageNotifier.SendToUserAsync(recieverConnectionId, "MessageUpdate", message.ToDto());
+    }
+
+    if (connectionStore.TryGet(currentUserService.UserId.ToString(), out string senderConnectionId))
+    {
+      await messageNotifier.SendToUserAsync(senderConnectionId, "UpdateDone", message.ToDto());
+    }
   }
 }

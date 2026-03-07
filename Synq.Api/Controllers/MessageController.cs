@@ -64,7 +64,7 @@ public class MessageController(IMediator mediator) : ControllerBase
   }
 
   [HttpPost("typing")]
-  public async Task<IActionResult> NotifyTyping([FromQuery] NotifyTypingCommand command)
+  public async Task<IActionResult> NotifyTyping([FromBody] NotifyTypingCommand command)
   {
     await mediator.Send(command);
     return Ok();

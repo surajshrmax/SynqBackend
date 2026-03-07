@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Synq.Api.Hubs;
+using Synq.Api.Middlewares;
 using Synq.Api.Realtime;
 using Synq.Application.Common.Interfaces;
 using Synq.Application.DependencyInjection;
@@ -64,6 +65,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 app.MapHub<MessageHub>("/messageHub");

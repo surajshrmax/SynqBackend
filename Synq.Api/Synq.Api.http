@@ -1,6 +1,4 @@
 @Synq.Api_HostAddress = http://localhost:5116
 
-GET {{Synq.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
+GET http://localhost:5116/
 ###

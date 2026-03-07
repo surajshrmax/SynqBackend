@@ -13,6 +13,7 @@ public class NotifyTypingHandler(
 {
   public async Task Handle(NotifyTypingCommand command, CancellationToken cancellationToken)
   {
+    Console.WriteLine("prepairing to send typing indicator");
     var chat = await dbContext.Chats
       .Where(c => c.Id == Guid.Parse(command.ChatId))
       .Include(c => c.ChatMembers)
@@ -20,16 +21,23 @@ public class NotifyTypingHandler(
 
     if (chat == null)
     {
+      Console.WriteLine("Chat is null");
       return;
     }
 
     var recieverId = chat.ChatMembers.FirstOrDefault(cm => cm.UserId != currentUserService.UserId).UserId;
 
-    if (recieverId != Guid.Empty &&
-        connectionStore.TryGet(recieverId.ToString(), out string receiverConnectionId))
+    if (recieverId == Guid.Empty)
     {
-      await messageNotifier.SendToUserAsync(receiverConnectionId, "StartTyping", currentUserService.UserId);
+      Console.WriteLine("recieverId is null");
+    }
+
+    if (connectionStore.TryGet(recieverId.ToString(), out string receiverConnectionId))
+    {
+      await messageNotifier.SendToUserAsync(receiverConnectionId, "Typing", new TypingData(currentUserService.UserId, command.IsTyping)); ;
       Console.WriteLine("Sending typing indicator to " + receiverConnectionId);
     }
   }
+
+  record TypingData(Guid UserId, bool IsTyping);
 }

@@ -12,28 +12,28 @@ namespace Synq.Infrastructure.Identity;
 
 public class JwtTokenService(IConfiguration configuration, IPasswordHasher hasher) : IJwtTokenService
 {
-    public TokenDto GenerateNewToken(User user)
-    {
-        var signinKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
-        var credentials = new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256);
+  public TokenDto GenerateNewToken(User user)
+  {
+    var signinKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
+    var credentials = new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256);
 
-        var b = new byte[64];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(b);
-        var refreshToken = hasher.HashPassword(Convert.ToBase64String(b));
+    var b = new byte[64];
+    using var rng = RandomNumberGenerator.Create();
+    rng.GetBytes(b);
+    var refreshToken = hasher.HashPassword(Convert.ToBase64String(b));
 
-        var claims = new List<Claim>
+    var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
         };
 
-        var token = new JwtSecurityToken(
-            issuer: configuration["Jwt:Issuer"], 
-            audience: configuration["Jwt:Audience"], 
-            expires: DateTime.UtcNow.AddHours(2), 
-            claims: claims, 
-            signingCredentials: credentials);
+    var token = new JwtSecurityToken(
+        issuer: configuration["Jwt:Issuer"],
+        audience: configuration["Jwt:Audience"],
+        claims: claims,
+        expires: DateTime.UtcNow.AddHours(2),
+        signingCredentials: credentials);
 
-        return new TokenDto(AccessToken: new JwtSecurityTokenHandler().WriteToken(token), RefreshToken: refreshToken );
-    }
+    return new TokenDto(AccessToken: new JwtSecurityTokenHandler().WriteToken(token), RefreshToken: refreshToken);
+  }
 }

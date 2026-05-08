@@ -32,15 +32,15 @@ public class SendMessageHandler(
       var memeberId = Guid.Parse(command.Id);
       var chatId = await chatService.CreateOneToOneChatAsync(currentUserId, memeberId, cancellationToken);
 
-      await SendMessage(chatId, command.Content, currentUserId, replyMessageId, cancellationToken);
+      await SendMessage(chatId, command.Content, command.LocalId, currentUserId, replyMessageId, cancellationToken);
     }
     else
     {
-      await SendMessage(Guid.Parse(command.Id), command.Content, currentUserId, replyMessageId, cancellationToken);
+      await SendMessage(Guid.Parse(command.Id), command.Content, command.LocalId, currentUserId, replyMessageId, cancellationToken);
     }
   }
 
-  private async Task SendMessage(Guid chatId, string content, Guid senderId, Guid? replyMessageId, CancellationToken cancellationToken)
+  private async Task SendMessage(Guid chatId, string content, string localId, Guid senderId, Guid? replyMessageId, CancellationToken cancellationToken)
   {
     var chat = await dbContext.Chats.AsNoTracking().Where(c => c.Id == chatId).Include(c => c.ChatMembers).FirstOrDefaultAsync(cancellationToken);
     Domain.Entities.Message message;
@@ -83,6 +83,14 @@ public class SendMessageHandler(
     await dbContext.SaveChangesAsync(cancellationToken);
 
     var recieverId = chat.ChatMembers.First(cm => cm.UserId != senderId).UserId;
+
+    await dbContext.MessageStatuses.AddAsync(new Domain.Entities.MessageStatus
+    {
+        MessageId = message.Id,
+        UserId = recieverId
+    }, cancellationToken);
+    await dbContext.SaveChangesAsync(cancellationToken);
+
     var sender = await dbContext.Users.AsNoTracking().Where(u => u.Id == senderId).Include(u => u.UserProfile).Select(UserMapper.ToDtoExpr).FirstAsync(cancellationToken);
     var messageDto = new MessageDto
     {
@@ -94,7 +102,7 @@ public class SendMessageHandler(
       ChatId = message.ChatId,
       Sender = sender,
       SenderId = message.SenderId,
-      SentAt = message.SentAt
+      SentAt = message.SentAt,
     };
 
     if (connectionStore.TryGet(recieverId.ToString(), out string recieverConnectionId))
@@ -110,8 +118,14 @@ public class SendMessageHandler(
     {
       await messageNotifier.SendToUserAsync(
           senderConnectionId,
-          "RecieveMessage",
-          messageDto
+          "MessageSent",
+          new MessageDto
+          {
+              Id = message.Id,
+              LocalId = localId,
+              Status = message.Status.Status,
+              SentAt = message.SentAt
+          }
       );
     }
   }

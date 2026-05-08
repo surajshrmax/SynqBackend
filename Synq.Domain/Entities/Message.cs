@@ -14,6 +14,8 @@ public class Message
   public Message? ReplyMessage { get; set; }
   public ICollection<Message> Replies { get; set; }
 
+  public MessageStatus Status { get; set; }
+
   public Guid SenderId { get; set; }
   public User Sender { get; set; }
 

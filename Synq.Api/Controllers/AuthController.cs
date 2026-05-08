@@ -12,7 +12,7 @@ namespace Synq.Api.Controllers;
 [ApiController]
 public class AuthController(IMediator mediator) : ControllerBase
 {
-    
+
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser(RegisterCommand registerCommand)
     {

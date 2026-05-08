@@ -15,7 +15,9 @@ public class User
     public UserProfile UserProfile { get; private set; } = null!;
 
     public ICollection<ChatMember> ChatMembers { get; set; }
-    
+
+    public ICollection<MessageStatus> MessageStatuses { get; set; }
+
     public User(){}
 
     public User(string username, string email, PasswordHash passwordHash)

@@ -9,6 +9,7 @@ using Synq.Application.Features.Message.GetOlderMessages;
 using Synq.Application.Features.Message.NotifyTyping;
 using Synq.Application.Features.Message.SendMessage;
 using Synq.Application.Features.Message.UpdateMessage;
+using Synq.Application.Features.Message.UpdateMessageStatus;
 
 namespace Synq.Api.Controllers;
 
@@ -69,4 +70,10 @@ public class MessageController(IMediator mediator) : ControllerBase
     await mediator.Send(command);
     return Ok();
   }
+
+    [HttpPost("status")]
+    public async Task<IActionResult> UpdateMessageStatus([FromBody] UpdateMessageStatusCommand command) {
+        await mediator.Send(command);
+        return Ok();
+    }
 }

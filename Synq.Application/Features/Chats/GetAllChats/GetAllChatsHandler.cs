@@ -13,7 +13,7 @@ public class GetAllChatsHandler(IApplicationDbContext dbContext, ICurrentUserSer
         .Where(c => c.ChatMembers.Any(m => m.UserId == currentUserService.UserId))
         .Select(
             c => new ChatDto(Id: c.Id, IsGroup: c.IsGroup, Title: c.Title,
-            User: c.ChatMembers.Where(u => u.UserId != currentUserService.UserId).Select(u => new UserDto
+            User: !c.IsGroup ? c.ChatMembers.Where(u => u.UserId != currentUserService.UserId).Select(u => new UserDto
             {
               Id = u.User.Id,
               UserProfile = new UserProfileDto
@@ -21,7 +21,7 @@ public class GetAllChatsHandler(IApplicationDbContext dbContext, ICurrentUserSer
                 Name = u.User.UserProfile.Name,
                 ImageUrl = u.User.UserProfile.ImageUrl,
               }
-            }).FirstOrDefault(),
+            }).FirstOrDefault() : null,
             LastMessage: c.Messages.OrderByDescending(m => m.SentAt)
                 .Select(m => new MessageDto
                 {
@@ -41,6 +41,6 @@ public class GetAllChatsHandler(IApplicationDbContext dbContext, ICurrentUserSer
                 .FirstOrDefault()))
         .ToListAsync(cancellationToken);
 
-    return chats;
+        return chats;
   }
 }

@@ -3,6 +3,7 @@ namespace Synq.Application.DTOs;
 public class MessageDto
 {
   public Guid Id { get; set; }
+  public string LocalId { get; set; }
   public string Content { get; set; }
   public bool IsEdited { get; set; }
   public Guid? ReplyMessageId { get; set; }
@@ -10,5 +11,6 @@ public class MessageDto
   public Guid ChatId { get; set; }
   public UserDto Sender { get; set; }
   public Guid SenderId { get; set; }
+  public string Status{ get; set; }
   public DateTime SentAt { get; set; }
 }

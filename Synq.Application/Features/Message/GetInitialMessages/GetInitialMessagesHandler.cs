@@ -58,6 +58,7 @@ public class GetInitialMessagesHandler(
                 ImageUrl = m.Sender.UserProfile.ImageUrl,
               }
             },
+            Status = m.Status.Status,
             SenderId = m.SenderId,
             SentAt = m.SentAt
           })
@@ -73,17 +74,19 @@ public class GetInitialMessagesHandler(
       };
     }
 
+    string? cursor = null;
+
     if (messageDtos.Count > pageSize)
     {
       messageDtos.RemoveAt(messageDtos.Count - 1);
       HasMore = true;
-    }
 
-    var cursor = jsonHelper.Encode(new MessageCursor
-    {
-      SentAt = messageDtos[messageDtos.Count - 1].SentAt,
-      MessageId = messageDtos[messageDtos.Count - 1].Id
-    });
+      cursor = jsonHelper.Encode(new MessageCursor
+      {
+        SentAt = messageDtos[messageDtos.Count - 1].SentAt,
+        MessageId = messageDtos[messageDtos.Count - 1].Id
+      });
+    }
 
     return new MessagePageResponse
     {

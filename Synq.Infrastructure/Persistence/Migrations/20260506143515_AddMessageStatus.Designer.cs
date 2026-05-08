@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Synq.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using Synq.Infrastructure.Persistence;
 namespace Synq.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506143515_AddMessageStatus")]
+    partial class AddMessageStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,9 +136,6 @@ namespace Synq.Infrastructure.Persistence.Migrations
                         .HasDefaultValue("sent");
 
                     b.HasKey("MessageId", "UserId");
-
-                    b.HasIndex("MessageId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -292,13 +292,13 @@ namespace Synq.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Synq.Domain.Entities.MessageStatus", b =>
                 {
                     b.HasOne("Synq.Domain.Entities.Message", "Message")
-                        .WithOne("Status")
-                        .HasForeignKey("Synq.Domain.Entities.MessageStatus", "MessageId")
+                        .WithMany()
+                        .HasForeignKey("MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Synq.Domain.Entities.User", "User")
-                        .WithMany("MessageStatuses")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -365,16 +365,11 @@ namespace Synq.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Synq.Domain.Entities.Message", b =>
                 {
                     b.Navigation("Replies");
-
-                    b.Navigation("Status")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Synq.Domain.Entities.User", b =>
                 {
                     b.Navigation("ChatMembers");
-
-                    b.Navigation("MessageStatuses");
 
                     b.Navigation("UserProfile")
                         .IsRequired();

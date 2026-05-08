@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Chat> Chats => Set<Chat>();
     public DbSet<ChatMember> ChatMembers => Set<ChatMember>();
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<MessageStatus> MessageStatuses => Set<MessageStatus>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

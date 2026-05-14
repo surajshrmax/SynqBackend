@@ -2,7 +2,6 @@
   "profiles": {
     "http": {
       "commandName": "Project",
-      "commandLineArgs": "--urls http://0.0.0.0:5213",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

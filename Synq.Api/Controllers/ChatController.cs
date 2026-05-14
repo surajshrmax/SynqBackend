@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Synq.Application.Features.Chats.GetAllChats;
 using Synq.Application.Features.Group.CreateGroup;
 using Synq.Application.Features.Group.GetGroupInfo;
+using Synq.Application.Features.Group.GetMembers;
 
 namespace Synq.Api.Controllers;
 
@@ -31,5 +32,10 @@ public class ChatController(IMediator mediator) : ControllerBase
   {
     return Ok(await mediator.Send(query));
   }
-  
+
+    [HttpGet("group/members")]
+    public async Task<ActionResult> GetGroupMembers([FromQuery] GetMembersQuery query)
+    {
+        return Ok(await mediator.Send(query));
+    }
 }

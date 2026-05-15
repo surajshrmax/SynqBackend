@@ -21,7 +21,7 @@ public class GetMemberHandler(
         var members = await dbContext.Chats.AsNoTracking().Where(c => c.Id == Guid.Parse(request.GroupId)).Select(c => c.ChatMembers.Select(cm => new GroupMemberDto
         {
             Id = cm.UserId,
-            IsAdmin = cm.IsAdmin ?? false,
+            Role = cm.Role.ToString(),
             Name = cm.User.UserProfile.Name,
             ImageUrl = cm.User.UserProfile.ImageUrl,
             JoinedDate = cm.CreatedAt

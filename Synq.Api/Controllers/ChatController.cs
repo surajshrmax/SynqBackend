@@ -2,9 +2,11 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Synq.Application.Features.Chats.GetAllChats;
+using Synq.Application.Features.Group.AddMember;
 using Synq.Application.Features.Group.CreateGroup;
 using Synq.Application.Features.Group.GetGroupInfo;
 using Synq.Application.Features.Group.GetMembers;
+using Synq.Application.Features.Group.RemoveMember;
 
 namespace Synq.Api.Controllers;
 
@@ -37,5 +39,19 @@ public class ChatController(IMediator mediator) : ControllerBase
     public async Task<ActionResult> GetGroupMembers([FromQuery] GetMembersQuery query)
     {
         return Ok(await mediator.Send(query));
+    }
+
+    [HttpPost("group")]
+    public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command)
+    {
+        await mediator.Send(command);
+        return Ok();
+    }
+
+    [HttpDelete("group/members")]
+    public async Task<IActionResult> RemoveMember([FromBody] RemoveMemberCommand command)
+    {
+        await mediator.Send(command);
+        return Ok();
     }
 }

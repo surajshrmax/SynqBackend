@@ -17,8 +17,8 @@ public class CacheService : ICacheService
         return await db.StringGetAsync(key);
     }
 
-    public async Task SetValueAsync(string key, string value)
+    public async Task SetValueAsync(string key, string value, TimeSpan expiresIn)
     {
-        await db.StringSetAsync(key, value);
+        await db.StringSetAsync(key, value, expiresIn);
     }
 }

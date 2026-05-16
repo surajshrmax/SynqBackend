@@ -6,7 +6,7 @@ namespace Synq.Application.Common.Interfaces;
 
 public interface ICacheService
 {
-    public Task SetValueAsync(string key, string value);
+    public Task SetValueAsync(string key, string value, TimeSpan expiresIn);
 
     public Task<string?> GetValueAsync(string key);
 }

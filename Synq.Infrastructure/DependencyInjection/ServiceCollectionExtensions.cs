@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
     services.AddScoped<IChatService, ChatService>();
     services.AddScoped(typeof(IJsonHelper<>), typeof(JsonHelper<>));
     services.AddSingleton<IConnectionStore, ConnectionStore>();
+    services.AddSingleton<ICacheService, CacheService>();
     return services;
   }
 }

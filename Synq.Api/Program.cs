@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using Synq.Api.Hubs;
 using Synq.Api.Middlewares;
 using Synq.Api.Realtime;
@@ -55,6 +56,12 @@ builder.Services.AddAuthentication(options =>
       return Task.CompletedTask;
     }
   };
+});
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var config = builder.Configuration.GetSection("Redis")["ConnectionString"];
+    return ConnectionMultiplexer.Connect(config);
 });
 
 

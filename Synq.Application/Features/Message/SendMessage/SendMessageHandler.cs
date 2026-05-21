@@ -1,10 +1,9 @@
-using System.ComponentModel;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Synq.Application.Common.Interfaces;
 using Synq.Application.DTOs;
-using Synq.Application.DTOs.Message;
 using Synq.Application.Mappers;
+using Synq.Domain.Entities;
 using Synq.Domain.Enums;
 
 namespace Synq.Application.Features.Message.SendMessage;
@@ -13,8 +12,9 @@ public class SendMessageHandler(
     IApplicationDbContext dbContext,
     ICurrentUserService currentUserService,
     IChatService chatService,
-    IConnectionStore connectionStore,
-    IRealTimeMessageNotifier messageNotifier
+    IRealTimeMessageNotifier messageNotifier,
+    ICacheService cacheService,
+    IJsonHelper<Chat> jsonHelper
     ) : IRequestHandler<SendMessageCommand>
 {
   public async Task Handle(SendMessageCommand command, CancellationToken cancellationToken)
@@ -42,7 +42,35 @@ public class SendMessageHandler(
 
   private async Task SendMessage(Guid chatId, string content, string localId, Guid senderId, Guid? replyMessageId, CancellationToken cancellationToken)
   {
-    var chat = await dbContext.Chats.AsNoTracking().Where(c => c.Id == chatId).Include(c => c.ChatMembers).FirstOrDefaultAsync(cancellationToken);
+    Chat? chat;
+
+    string chatKey = $"chat {chatId}";
+
+    var cachedChat = await cacheService.GetValueAsync(chatKey);
+
+
+    if (cachedChat != null)
+    {
+      chat = jsonHelper.Decode(cachedChat);
+    }
+    else
+    {
+      chat = await dbContext.Chats
+        .AsNoTracking()
+        .Where(c => c.Id == chatId)
+        .Select(c => new Chat
+        {
+          Id = c.Id,
+          ChatMembers = c.ChatMembers.Select(cm => new ChatMember
+          {
+            UserId = cm.UserId
+          }).ToList()
+        })
+        .FirstOrDefaultAsync(cancellationToken);
+
+      await cacheService.SetValueAsync(chatKey, jsonHelper.Encode(chat), TimeSpan.FromMinutes(30));
+    }
+
     Domain.Entities.Message message;
     MessageDto? reply = null;
 
@@ -86,47 +114,35 @@ public class SendMessageHandler(
 
     await dbContext.MessageStatuses.AddAsync(new Domain.Entities.MessageStatus
     {
-        MessageId = message.Id,
-        UserId = recieverId
+      MessageId = message.Id,
+      UserId = recieverId
     }, cancellationToken);
     await dbContext.SaveChangesAsync(cancellationToken);
 
-    var sender = await dbContext.Users.AsNoTracking().Where(u => u.Id == senderId).Include(u => u.UserProfile).Select(UserMapper.ToDtoExpr).FirstAsync(cancellationToken);
     var messageDto = new MessageDto
     {
       Id = message.Id,
       Content = message.Content,
-      IsEdited = message.IsEdited,
-      ReplyMessageId = message.ReplyMessageId,
       Reply = reply,
-      ChatId = message.ChatId,
-      Sender = sender,
       SenderId = message.SenderId,
       SentAt = message.SentAt,
     };
 
-    if (connectionStore.TryGet(recieverId.ToString(), out string recieverConnectionId))
-    {
-      await messageNotifier.SendToUserAsync(
-          recieverConnectionId,
-          "RecieveMessage",
-          messageDto
-      );
-    }
+    await messageNotifier.SendToUserAsync(
+        recieverId.ToString(),
+        "RecieveMessage",
+        messageDto
+    );
 
-    if (connectionStore.TryGet(message.SenderId.ToString(), out string senderConnectionId))
-    {
-      await messageNotifier.SendToUserAsync(
-          senderConnectionId,
-          "MessageSent",
-          new MessageDto
-          {
-              Id = message.Id,
-              LocalId = localId,
-              Status = message.Status.Status,
-              SentAt = message.SentAt
-          }
-      );
-    }
+    await messageNotifier.SendToUserAsync(
+        currentUserService.UserId.ToString(),
+        "MessageSent",
+        new MessageDto
+        {
+          Id = message.Id,
+          LocalId = localId,
+          Status = message.Status.Status,
+          SentAt = message.SentAt
+        });
   }
 }

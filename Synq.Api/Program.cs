@@ -10,14 +10,16 @@ using Synq.Application.Common.Interfaces;
 using Synq.Application.DependencyInjection;
 using Synq.Infrastructure.DependencyInjection;
 using Synq.Infrastructure.Identity;
-using Synq.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddSignalR().AddHubOptions<MessageHub>(options => options.EnableDetailedErrors = true);
+builder.Services.AddSignalR()
+  .AddStackExchangeRedis(
+      builder.Configuration.GetSection("Redis")["ConnectionString"]!,
+      options => options.Configuration.ChannelPrefix = RedisChannel.Literal("Synq"));
 
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -58,12 +60,12 @@ builder.Services.AddAuthentication(options =>
   };
 });
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-{
-    var config = builder.Configuration.GetSection("Redis")["ConnectionString"];
-    return ConnectionMultiplexer.Connect(config);
-});
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetSection("Redis")["ConnectionString"]!));
 
+
+builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
 
 var app = builder.Build();
 

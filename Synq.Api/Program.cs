@@ -79,4 +79,5 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 app.MapHub<MessageHub>("/messageHub");
+app.MapHub<ChatHub>("/chatHub");
 app.Run();

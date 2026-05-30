@@ -37,37 +37,38 @@ public class ChatController(IMediator mediator) : ControllerBase
     return Ok(await mediator.Send(query));
   }
 
-    [HttpGet("group/members")]
-    public async Task<ActionResult> GetGroupMembers([FromQuery] GetMembersQuery query)
-    {
-        return Ok(await mediator.Send(query));
-    }
+  [HttpGet("group/members")]
+  public async Task<ActionResult> GetGroupMembers([FromQuery] GetMembersQuery query)
+  {
+    return Ok(await mediator.Send(query));
+  }
 
-    [HttpPost("group")]
-    public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command)
-    {
-        await mediator.Send(command);
-        return Ok();
-    }
+  [HttpPost("group")]
+  public async Task<IActionResult> AddMember([FromBody] AddMemberCommand command)
+  {
+    await mediator.Send(command);
+    return Ok();
+  }
 
-    [HttpDelete("group/members")]
-    public async Task<IActionResult> RemoveMember([FromBody] RemoveMemberCommand command)
-    {
-        await mediator.Send(command);
-        return Ok();
-    }
+  [HttpDelete("group/members")]
+  public async Task<IActionResult> RemoveMember([FromBody] RemoveMemberCommand command)
+  {
+    await mediator.Send(command);
+    return Ok();
+  }
 
-    [HttpPost("group/exit")]
-    public async Task<IActionResult> ExitGroup([FromQuery] ExitGroupCommnad commnad)
-    {
-        await mediator.Send(commnad);
-        return Ok();
-    }
+  [HttpPost("group/exit")]
+  public async Task<IActionResult> ExitGroup([FromQuery] ExitGroupCommnad commnad)
+  {
+    await mediator.Send(commnad);
+    return Ok();
+  }
 
-    [HttpPatch("group/member")]
-    public async Task<IActionResult> UpdateMemberRole([FromBody] UpdateRoleCommand command)
-    {
-        await mediator.Send(command);
-        return Ok();
-    }
+  [HttpPatch("group/member")]
+  public async Task<IActionResult> UpdateMemberRole([FromBody] UpdateRoleCommand command)
+  {
+    await mediator.Send(command);
+    return Ok();
+  }
+
 }

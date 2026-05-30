@@ -7,8 +7,7 @@ namespace Synq.Application.Features.Message.NotifyTyping;
 public class NotifyTypingHandler(
     IApplicationDbContext dbContext,
     ICurrentUserService currentUserService,
-    IConnectionStore connectionStore,
-    IRealTimeMessageNotifier messageNotifier
+    IConnectionStore connectionStore
 ) : IRequestHandler<NotifyTypingCommand>
 {
   public async Task Handle(NotifyTypingCommand command, CancellationToken cancellationToken)
@@ -34,10 +33,8 @@ public class NotifyTypingHandler(
 
     if (connectionStore.TryGet(recieverId.ToString(), out string receiverConnectionId))
     {
-      await messageNotifier.SendToUserAsync(receiverConnectionId, "Typing", new TypingData(currentUserService.UserId, command.IsTyping)); ;
       Console.WriteLine("Sending typing indicator to " + receiverConnectionId);
     }
   }
-
   record TypingData(Guid UserId, bool IsTyping);
 }

@@ -1,6 +1,5 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using Synq.Api.Hubs;
@@ -23,7 +22,7 @@ builder.Services.AddSignalR()
 
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddSingleton<IRealTimeMessageNotifier, RealtimeMessageNotifier>();
+builder.Services.AddSingleton<IRealtimeChatNotifier, RealtimeChatNotifier>();
 builder.Services.AddApplication();
 
 builder.Services.AddAuthentication(options =>
@@ -78,6 +77,5 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
-app.MapHub<MessageHub>("/messageHub");
 app.MapHub<ChatHub>("/chatHub");
 app.Run();

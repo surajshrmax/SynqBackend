@@ -9,6 +9,5 @@ public class SendMessageValidator : AbstractValidator<SendMessageCommand>
   {
     RuleFor(x => x.Id).NotNull().NotEmpty();
     RuleFor(x => x.Content).NotNull().NotEmpty();
-    RuleFor(x => x.IsChat).NotNull();
   }
 }

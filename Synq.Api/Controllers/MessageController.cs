@@ -19,27 +19,6 @@ namespace Synq.Api.Controllers;
 public class MessageController(IMediator mediator) : ControllerBase
 {
 
-  [HttpPost]
-  public async Task<IActionResult> SendMessage(SendMessageCommand command)
-  {
-    await mediator.Send(command);
-    return Ok();
-  }
-
-  [HttpDelete]
-  public async Task<IActionResult> DeleteMessage(DeleteMessageCommand command)
-  {
-    await mediator.Send(command);
-    return Ok();
-  }
-
-  [HttpPatch]
-  public async Task<IActionResult> UpdateMessage(UpdateMessageCommand command)
-  {
-    await mediator.Send(command);
-    return Ok();
-  }
-
   [HttpGet("initial")]
   public async Task<IActionResult> GetInitialMessages([FromQuery] GetInitialMessagesQuery query)
   {
@@ -71,9 +50,10 @@ public class MessageController(IMediator mediator) : ControllerBase
     return Ok();
   }
 
-    [HttpPost("status")]
-    public async Task<IActionResult> UpdateMessageStatus([FromBody] UpdateMessageStatusCommand command) {
-        await mediator.Send(command);
-        return Ok();
-    }
+  [HttpPost("status")]
+  public async Task<IActionResult> UpdateMessageStatus([FromBody] UpdateMessageStatusCommand command)
+  {
+    await mediator.Send(command);
+    return Ok();
+  }
 }
